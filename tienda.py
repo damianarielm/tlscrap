@@ -45,11 +45,10 @@ def main(archivo, paginas):
         print(f"{len(juegos)} juegos.")
 
         for nombre, precio in juegos:
-            try:
-                diccionario[nombre][fecha] = precio
-            except:
+            if nombre not in diccionario:
                 diccionario[nombre] = {}
-                diccionario[nombre][fecha] = precio
+
+            diccionario[nombre][fecha] = precio
 
     guardar_diccionario(archivo, diccionario)
 

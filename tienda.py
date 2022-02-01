@@ -1,5 +1,4 @@
 from requests_html import HTMLSession
-from bs4 import BeautifulSoup
 from datetime import datetime
 from json import dump, load
 
@@ -28,12 +27,11 @@ def obtener_juegos(pagina):
     url = f"https://tiendaludica.com.ar/#!/categoria/0/pagina/{pagina}/"
     content = HTMLSession().get(url).html
     content.render(sleep = 2)
-    soup = BeautifulSoup(content.raw_html, "html.parser")
 
     lista = []
-    for juego in soup.find_all("div", "thumbnail"):
-        nombre = juego.find("span")["title"].strip()
-        precio = juego.find("span", "monto").text.replace(".", "")
+    for juego in content.find("div.thumbnail"):
+        nombre = juego.find("span[title]")[0].text.strip()
+        precio = juego.find("span.monto")[0].text.replace(".", "")
         lista.append( (nombre, float(precio.replace(",", "."))) )
 
     return lista

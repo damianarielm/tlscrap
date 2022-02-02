@@ -4,10 +4,9 @@ from json import dump, load
 
 def mostrar_juegos(diccionario):
     for nombre, fechas in diccionario.items():
-        print(f"{nombre}")
+        print(f"\n{nombre}")
         for fecha, precio in fechas.items():
             print(f"{fecha}: ${precio}")
-        print("")
 
 def cargar_diccionario(archivo):
     try:
@@ -28,26 +27,19 @@ def obtener_juegos(pagina):
     content = HTMLSession().get(url).html
     content.render(sleep = 2)
 
-    lista = []
     for juego in content.find("div.thumbnail"):
         nombre = juego.find("span[title]")[0].text.strip()
         precio = juego.find("span.monto")[0].text.replace(".", "")
-        lista.append( (nombre, float(precio.replace(",", "."))) )
-
-    return lista
+        yield nombre, float(precio.replace(",", "."))
 
 def main(archivo, paginas):
     diccionario = cargar_diccionario(archivo)
 
     for pagina in range(paginas + 1):
-        print(f"Revisando pagina {pagina}...", end = " ", flush = True)
-        juegos = obtener_juegos(pagina)
-        print(f"{len(juegos)} juegos.")
+        print(f"Revisando pagina {pagina}...")
 
-        for nombre, precio in juegos:
-            if nombre not in diccionario:
-                diccionario[nombre] = {}
-
+        for nombre, precio in obtener_juegos(pagina):
+            diccionario.setdefault(nombre, {})
             diccionario[nombre][fecha] = precio
 
     guardar_diccionario(archivo, diccionario)
